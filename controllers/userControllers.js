@@ -108,8 +108,8 @@ exports.loginUser = async (req, res) => {
         if (!user) {
             return res.status(404).send();
         } else {
-            const authentication = await bcrypt.compareSync(password, user.rows[0].password);
-            if (authentication){
+            const isAuth = await bcrypt.compareSync(password, user.rows[0].password);
+            if (isAuth){
                 res.send(user.rows);
             } else {
                 res.status(401).send();
