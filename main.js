@@ -3,6 +3,8 @@ const app = express();
 
 const db = require('./config/database')
 
+const PORT = process.env.PORT;
+
 app.use(express.json());
 app.use(express.urlencoded({extended: false, limit: '50mb'}))
 
@@ -19,7 +21,7 @@ const userRoutes = require('./routes/userRoute');
 app.use(userRoutes)
 
 db.connect();
-app.listen(8080, err => {
+app.listen(process.env.PORT, err => {
     if (err) console.log(err);
-    console.log('Connected to port 8080')
+    console.log(`Connected to port ${PORT} `)
 });
