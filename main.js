@@ -8,13 +8,13 @@ const PORT = process.env.PORT;
 app.use(express.json());
 app.use(express.urlencoded({extended: false, limit: '50mb'}))
 
-// app.use((req, res, next) => {
-//     res.setHeader('Access-Control-Allow-Origin', ['*']);
-//     res.setHeader('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
-//     res.setHeader('Content-Type', 'application/json');
-//     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-//     next();
-// });
+app.use((req, res, next) => {
+    res.setHeader('Access-Control-Allow-Origin', ['*']);
+    res.setHeader('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    next();
+});
 
 const userRoutes = require('./routes/userRoute');
 
