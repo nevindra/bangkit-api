@@ -3,18 +3,18 @@ const router = express.Router();
 
 const userControllers = require('../controllers/userControllers');
 
-router.get('/users', userControllers.getUsers);
+router.get('v1/api/users', userControllers.getUsers);
 
-router.get('/users/email=:email', userControllers.getUserByEmail);
+router.get('v1/api/users/email=:email', userControllers.getUserByEmail);
 
-router.get('/users/:id', userControllers.getUserByID);
+router.get('v1/api/users/:id', userControllers.getUserByID);
 
-router.post('/registration', userControllers.postRegistration);
+router.post('v1/api/registration', userControllers.postRegistration);
 
-router.post('/login', userControllers.loginUser);
+router.post('v1/api/login', userControllers.loginUser);
 
 // router.patch('/users/:id', userControllers.editUser);
 //
-router.delete('/users/:id', userControllers.deleteUser);
+router.delete('v1/api/users/:id', userControllers.deleteUser);
 
 module.exports = router;

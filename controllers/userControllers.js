@@ -54,7 +54,9 @@ exports.postRegistration = async (req, res) => {
             [full_name, email, encryptedPassword, phone_number, encryptedVerification]
         )
 
-        res.status(201).send(user)
+        const registeredUser = await client.query('SELECT * FROM users WHERE email = $1', [email]);
+
+        res.status(201).send(registeredUser)
     } catch (e) {
         console.log(e)
         res.status(400).send(e);
