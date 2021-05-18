@@ -112,7 +112,7 @@ exports.loginUser = async (req, res) => {
         } else {
             const isAuth = await bcrypt.compareSync(password, user.rows[0].password);
             if (isAuth){
-                res.send(user.rows);
+                res.status(200).send(user.rows);
             } else {
                 res.status(401).send();
             }
@@ -123,3 +123,4 @@ exports.loginUser = async (req, res) => {
         res.status(500).send();
     }
 };
+
