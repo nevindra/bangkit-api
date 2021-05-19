@@ -41,9 +41,12 @@ app.use(multer({
 
 const userRoutes = require('./routes/userRoute');
 const vehicleRoutes = require('./routes/vehicleRoute');
+const transactionRoutes = require('./routes/transactionRoute');
 
 app.use('/api/v1', userRoutes);
 app.use('/api/v1', vehicleRoutes);
+app.use('/api/v1', transactionRoutes);
+
 db.connect();
 app.listen(process.env.PORT, err => {
     if (err) console.log(err);

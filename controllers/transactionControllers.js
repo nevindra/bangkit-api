@@ -42,3 +42,19 @@ exports.historyTransaction = async (req, res) => {
         res.status(500).send();
     }
 };
+
+exports.topUp = async (req, res) => {
+
+    const {id_user, amount, card_number} = req.body;
+
+    try {
+        await client.query(
+            'INSERT INTO user_recharge(id_user,amount,card_number) VALUES($1,$2,$3)',
+            [id_user, amount, card_number]
+        )
+        res.status(201).send()
+    } catch (e) {
+        console.log(e);
+        res.status(500).send();
+    }
+};

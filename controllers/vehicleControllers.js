@@ -10,7 +10,7 @@ exports.registerVehicle = async (req, res, next) => {
             'INSERT INTO user_vehicle(id_user,plate_number,car_type,img_stnk) VALUES($1,$2,$3,$4)',
             [id_user, plate_number, car_type,imageUrl]
         )
-        res.status(201)
+        res.status(201).send()
     } catch (e) {
         console.log(e)
         res.status(400).send(e);
