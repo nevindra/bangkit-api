@@ -56,7 +56,7 @@ exports.postRegistration = async (req, res) => {
 
         const registeredUser = await client.query('SELECT * FROM users WHERE email = $1', [email]);
 
-        res.status(201).send(registeredUser)
+        res.status(201).send(registeredUser.rows[0])
     } catch (e) {
         console.log(e)
         res.status(400).send(e);
@@ -112,7 +112,11 @@ exports.loginUser = async (req, res) => {
         } else {
             const isAuth = await bcrypt.compareSync(password, user.rows[0].password);
             if (isAuth){
-                res.status(200).send(user.rows);
+                const userData = await client.query('SELECT users.id_user, users.full_name, users.phone_number, users.email, SUM(amount) as balance ' +
+                    'FROM users JOIN user_recharge ' +
+                    'ON (users.id_user = user_recharge.id_user) ' +
+                    'GROUP BY users.id_user;')
+                res.status(200).send(userData.rows[0]);
             } else {
                 res.status(401).send();
             }

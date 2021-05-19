@@ -12,7 +12,7 @@ exports.confirmationPayment = async (req, res) => {
             let verification_pin_user = user.rows[0].verification_pin
             console.log(verification_pin_user)
             const isAuth = await bcrypt.compareSync(verification_pin, verification_pin_user);
-            if (isAuth){
+            if (isAuth) {
                 res.status(200);
             } else {
                 res.status(401).send();
@@ -44,7 +44,6 @@ exports.historyTransaction = async (req, res) => {
 };
 
 exports.topUp = async (req, res) => {
-
     const {id_user, amount, card_number} = req.body;
 
     try {
