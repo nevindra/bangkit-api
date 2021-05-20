@@ -6,7 +6,6 @@ const userControllers = require('../controllers/userControllers');
 // Colletions :
 
 router.get('/users', userControllers.getUsers);
-router.get('/users/email=:email', userControllers.getUserByEmail);
 router.get('/users/:id', userControllers.getUserByID);
 
 router.post('/registration', userControllers.postRegistration);

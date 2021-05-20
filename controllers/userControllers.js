@@ -14,20 +14,6 @@ exports.getUsers = async (req, res) => {
 
 };
 
-exports.getUserByEmail = async (req, res) => {
-    const email = req.params.email;
-
-    try {
-        const user = await client.query('SELECT * FROM users WHERE email = $1', [email]);
-        res.send(user.rows);
-
-        if (!user) res.status(404).send();
-
-    } catch (e) {
-        res.status(500).send();
-    }
-};
-
 exports.getUserByID = async (req, res) => {
     const id_user = parseInt(req.params.id);
 
@@ -46,15 +32,14 @@ exports.postRegistration = async (req, res) => {
     const {full_name, email, password, phone_number, verification_pin} = req.body;
     const saltRounds = 12;
     try {
-        const salt = bcrypt.genSaltSync(saltRounds);
-        const encryptedPassword = bcrypt.hashSync(password, salt);
-        const encryptedVerification = bcrypt.hashSync(verification_pin, salt);
-
         const checkUser = await client.query('SELECT * FROM users WHERE email = $1', [email])
-
-        if (checkUser) {
-            res.status(409).send();
+        if (checkUser.rows.length === 1) {
+            res.status(409).send()
         } else {
+            const salt = bcrypt.genSaltSync(saltRounds);
+            const encryptedPassword = bcrypt.hashSync(password, salt);
+            const encryptedVerification = bcrypt.hashSync(verification_pin, salt);
+
             await client.query(
                 'INSERT INTO users(full_name,email,password,phone_number,verification_pin) VALUES($1,$2,$3,$4,$5)',
                 [full_name, email, encryptedPassword, phone_number, encryptedVerification]
@@ -81,12 +66,11 @@ exports.loginUser = async (req, res) => {
 
     try {
         const user = await client.query('SELECT * FROM users WHERE email = $1', [email]);
-        if (!user) {
+        if (user.rows.length === 0) {
             return res.status(404).send();
         } else {
             const isAuth = await bcrypt.compareSync(password, user.rows[0].password);
             let id_user = user.rows[0].id_user;
-            console.log(id_user)
             if (isAuth){
                 const userData = await client.query('SELECT users.id_user, users.full_name, users.phone_number, users.email, balance.saldo ' +
                     'FROM users JOIN balance ' +
