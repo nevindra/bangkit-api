@@ -5,10 +5,9 @@ const vehicleControllers = require('../controllers/vehicleControllers');
 
 // Collections:
 router.get('/vehicles', vehicleControllers.getVehicles);
-router.get('/vehicles/:id')
+router.get('/vehicles/:id', vehicleControllers.deleteVehicleById)
 
 // Non Resource URL:
-router.post('/register-vehicle', vehicleControllers.registerVehicle);
-
+router.post('/register-vehicles', vehicleControllers.registerVehicle);
 
 module.exports = router

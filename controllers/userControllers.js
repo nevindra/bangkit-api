@@ -2,7 +2,7 @@
 const bcrypt = require("bcrypt");
 const client = require('../config/database')
 
-exports.getUsers = async (req, res, next) => {
+exports.getUsers = async (req, res) => {
 
     try {
         const results = await client.query('SELECT * FROM users');
@@ -14,7 +14,7 @@ exports.getUsers = async (req, res, next) => {
 
 };
 
-exports.getUserByEmail = async (req, res, next) => {
+exports.getUserByEmail = async (req, res) => {
     const email = req.params.email;
 
     try {
@@ -28,7 +28,7 @@ exports.getUserByEmail = async (req, res, next) => {
     }
 };
 
-exports.getUserByID = async (req, res, next) => {
+exports.getUserByID = async (req, res) => {
     const id_user = parseInt(req.params.id);
 
     try {
@@ -49,43 +49,60 @@ exports.postRegistration = async (req, res) => {
         const salt = bcrypt.genSaltSync(saltRounds);
         const encryptedPassword = bcrypt.hashSync(password, salt);
         const encryptedVerification = bcrypt.hashSync(verification_pin, salt);
-        const user = await client.query(
-            'INSERT INTO users(full_name,email,password,phone_number,verification_pin) VALUES($1,$2,$3,$4,$5)',
-            [full_name, email, encryptedPassword, phone_number, encryptedVerification]
-        )
 
-        const registeredUser = await client.query('SELECT * FROM users WHERE email = $1', [email]);
+        const checkUser = await client.query('SELECT * FROM users WHERE email = $1', [email])
 
-        res.status(201).send(registeredUser.rows[0])
+        if (checkUser) {
+            res.status(409).send();
+        } else {
+            await client.query(
+                'INSERT INTO users(full_name,email,password,phone_number,verification_pin) VALUES($1,$2,$3,$4,$5)',
+                [full_name, email, encryptedPassword, phone_number, encryptedVerification]
+            );
+
+            const registeredUser = await client.query('SELECT * FROM users WHERE email = $1', [email]);
+
+            await client.query(
+                'INSERT INTO balance(id_user,saldo) VALUES($1,0)',
+                [registeredUser.rows[0].id_user]
+            );
+
+            res.status(201).send(registeredUser.rows[0]);
+        }
+
     } catch (e) {
-        console.log(e)
+        console.log(e);
         res.status(400).send(e);
     }
 };
 
-// exports.editUser = async (req, res) => {
-//
-//     const updates = Object.keys(req.body);
-//     const validOperations = ['username', 'email'];
-//     const isValid = updates.every((update) => validOperations.includes(update))
-//
-//     if (!isValid) {
-//         return res.status(400).send({'error': 'Invalid updates.'})
-//     }
-//
-//     try {
-//         const user = await Profile.findByIdAndUpdate(req.params.id, req.body, {new: true});
-//
-//         if(!user) res.status(404).send();
-//
-//         res.send(user)
-//     } catch (e) {
-//         console.log(e)
-//
-//         res.status(400).send();
-//     }
-// };
-//
+exports.loginUser = async (req, res) => {
+    const {email, password} = req.body;
+
+    try {
+        const user = await client.query('SELECT * FROM users WHERE email = $1', [email]);
+        if (!user) {
+            return res.status(404).send();
+        } else {
+            const isAuth = await bcrypt.compareSync(password, user.rows[0].password);
+            let id_user = user.rows[0].id_user;
+            console.log(id_user)
+            if (isAuth){
+                const userData = await client.query('SELECT users.id_user, users.full_name, users.phone_number, users.email, balance.saldo ' +
+                    'FROM users JOIN balance ' +
+                    'ON (balance.id_user = $1) ' +
+                    'GROUP BY users.id_user, balance.saldo;',[id_user])
+                res.status(200).send(userData.rows);
+            } else {
+                res.status(401).send();
+            }
+        }
+
+    } catch (e) {
+        console.log(e);
+        res.status(500).send();
+    }
+};
 
 exports.deleteUser = async (req, res) => {
     const id_user = parseInt(req.params.id)
@@ -99,32 +116,6 @@ exports.deleteUser = async (req, res) => {
     } catch (e) {
         console.log(e);
         res.status(400).send();
-    }
-};
-
-exports.loginUser = async (req, res) => {
-    const {email, password} = req.body;
-
-    try {
-        const user = await client.query('SELECT * FROM users WHERE email = $1', [email]);
-        if (!user) {
-            return res.status(404).send();
-        } else {
-            const isAuth = await bcrypt.compareSync(password, user.rows[0].password);
-            if (isAuth){
-                const userData = await client.query('SELECT users.id_user, users.full_name, users.phone_number, users.email, SUM(amount) as balance ' +
-                    'FROM users JOIN user_recharge ' +
-                    'ON (users.id_user = user_recharge.id_user) ' +
-                    'GROUP BY users.id_user;')
-                res.status(200).send(userData.rows[0]);
-            } else {
-                res.status(401).send();
-            }
-        }
-
-    } catch (e) {
-        console.log(e);
-        res.status(500).send();
     }
 };
 
