@@ -27,7 +27,7 @@ exports.getUserByID = async (req, res) => {
         res.status(500).send();
     }
 };
-
+//test webhooks github
 exports.postRegistration = async (req, res) => {
     const {full_name, email, password, phone_number, verification_pin} = req.body;
     const saltRounds = 12;
