@@ -74,7 +74,7 @@ exports.loginUser = async (req, res) => {
             if (isAuth){
                 const userData = await client.query('SELECT users.id_user, users.full_name, users.phone_number, users.email, balance.saldo ' +
                     'FROM users JOIN balance ' +
-                    'ON (users.id_user = $1) ' +
+                    'ON (users.id_user = $1 AND balance.id_user = $1) ' +
                     'GROUP BY users.id_user, balance.saldo;',[id_user])
                 res.status(200).send(userData.rows);
             } else {
