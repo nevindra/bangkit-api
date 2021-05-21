@@ -15,7 +15,7 @@ exports.getUsers = async (req, res) => {
 };
 
 exports.getUserByID = async (req, res) => {
-    const id_user = parseInt(req.params.id);
+    const {id_user} = req.body;
 
     try {
         const user = await client.query('SELECT * FROM users WHERE id_user = $1', [id_user]);
