@@ -48,7 +48,7 @@ exports.deleteVehicleById = async (req, res, next) => {
 
     try {
         const results = await client.query('SELECT * FROM user_vehicle WHERE id_user = $1 AND id_vehicle = $2', [id_user, id_vehicle]);
-        if (!results) {
+        if (results.rows.length === 1) {
             res.send(404);
         } else {
             await client.query('DELETE FROM user_vehicle WHERE id_user = $1 AND id_vehicle = $2', [id_user, id_vehicle]);
