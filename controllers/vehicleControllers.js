@@ -45,7 +45,7 @@ exports.getVehiclesById = async (req, res, next) => {
 exports.deleteVehicleById = async (req, res, next) => {
 
     const {id_user, id_vehicle} = req.body
-
+    // testing webhooks
     try {
         const results = await client.query('SELECT * FROM user_vehicle WHERE id_user = $1 AND id_vehicle = $2', [id_user, id_vehicle]);
         if (results.rows.length === 1) {
