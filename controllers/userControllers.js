@@ -21,7 +21,7 @@ exports.getUserByID = async (req, res) => {
         const user = await client.query('SELECT * FROM users WHERE id_user = $1', [id_user]);
         res.send(user.rows);
 
-        if (!user) res.status(404).send();
+        if (typeof user.rows[0] === 'undefined') res.status(404).send();
         console.log(user.rows[0].email)
     } catch (e) {
         res.status(500).send();
@@ -33,7 +33,7 @@ exports.postRegistration = async (req, res) => {
     const saltRounds = 12;
     try {
         const checkUser = await client.query('SELECT * FROM users WHERE email = $1', [email])
-        if (checkUser.rows.length === 1) {
+        if (typeof checkUser.rows[0] === 'undefined') {
             res.status(409).send()
         } else {
             const salt = bcrypt.genSaltSync(saltRounds);
@@ -66,7 +66,7 @@ exports.loginUser = async (req, res) => {
 
     try {
         const user = await client.query('SELECT * FROM users WHERE email = $1', [email]);
-        if (user.rows.length === 0) {
+        if (typeof user.rows[0] === 'undefined') {
             return res.status(404).send();
         } else {
             const isAuth = await bcrypt.compareSync(password, user.rows[0].password);
@@ -93,7 +93,6 @@ exports.deleteUser = async (req, res) => {
 
     try {
         const user = await client.query('DELETE FROM users WHERE id_user = $1', [id_user])
-
         if(!user) return res.status(404).send();
 
         res.send(`User deleted with ID: ${id_user}`)
