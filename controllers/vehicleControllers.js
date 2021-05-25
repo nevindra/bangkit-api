@@ -1,6 +1,6 @@
 const client = require('../config/database');
 
-exports.registerVehicle = async (req, res, next) => {
+exports.registerVehicle = async (req, res) => {
     const {id_user, plate_number, car_type} = req.body
     const image = req.file;
     const imageUrl = image.path;
@@ -10,14 +10,14 @@ exports.registerVehicle = async (req, res, next) => {
             'INSERT INTO user_vehicle(id_user,plate_number,car_type,img_stnk) VALUES($1,$2,$3,$4)',
             [id_user, plate_number, car_type,imageUrl]
         )
-        res.status(201).send()
+        res.status(201).send({'response': 'succeeded'})
     } catch (e) {
         console.log(e)
         res.status(400).send(e);
     }
 };
 
-exports.getVehicles = async (req, res, next) => {
+exports.getVehicles = async (req, res) => {
     const {id_user} = req.body
 
     try {
@@ -29,7 +29,7 @@ exports.getVehicles = async (req, res, next) => {
     }
 };
 
-exports.getVehiclesById = async (req, res, next) => {
+exports.getVehiclesById = async (req, res) => {
 
     const {id_user, id_vehicle} = req.body
 
@@ -42,7 +42,7 @@ exports.getVehiclesById = async (req, res, next) => {
     }
 };
 
-exports.deleteVehicleById = async (req, res, next) => {
+exports.deleteVehicleById = async (req, res) => {
 // test webhooks github
     const {id_user, id_vehicle} = req.body
 
