@@ -13,7 +13,7 @@ exports.confirmationPayment = async (req, res) => {
             let verification_pin_user = user.rows[0].verification_pin
             const isAuth = await bcrypt.compareSync(verification_pin, verification_pin_user);
             if (isAuth) {
-                res.status(200).send();
+                res.status(200).send({'response': 'succeeded'});
             } else {
                 res.status(401).send();
             }
