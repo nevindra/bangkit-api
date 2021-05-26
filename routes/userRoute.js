@@ -13,6 +13,7 @@ router.post('/registration', userControllers.postRegistration);
 router.post('/login', userControllers.loginUser);
 
 // router.patch('/users/:id', userControllers.editUser);
+
 router.delete('/users/:id', userControllers.deleteUser);
 
 module.exports = router;
