@@ -1,7 +1,6 @@
 const express = require('express');
 const app = express();
 const multer = require('multer');
-
 const db = require('./config/database')
 
 const PORT = process.env.PORT;
@@ -9,7 +8,7 @@ const PORT = process.env.PORT;
 const fileStorage = multer.diskStorage(
     {
         destination: function (req, file, cb) {
-            cb(null, '../images/')
+            cb(null, './images/')
         },
         filename: function (req, file, cb) {
             cb(null, req.body.plate_number + "_" + req.body.id_user + "_" + req.body.car_type + "." + file.originalname.split(".")[1])

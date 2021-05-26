@@ -2,7 +2,6 @@ const client = require('../config/database');
 const bcrypt = require('bcrypt');
 
 exports.confirmationPayment = async (req, res) => {
-
     const {id_user, verification_pin} = req.body;
     try {
         const user = await client.query('SELECT * FROM users WHERE id_user = $1', [id_user]);

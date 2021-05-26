@@ -29,7 +29,8 @@ exports.postRegistration = async (req, res) => {
     const saltRounds = 12;
     try {
         const checkUser = await client.query('SELECT * FROM users WHERE email = $1', [email])
-        if (typeof checkUser.rows[0] === 'undefined') return res.status(409).send({'response': 'user not found'})
+        if (checkUser.rows.length === 1) return res.status(409)
+            .send({'response': 'user found. cant make double account for the same person'})
 
         const salt = bcrypt.genSaltSync(saltRounds);
         const encryptedPassword = bcrypt.hashSync(password, salt);
@@ -69,7 +70,6 @@ exports.loginUser = async (req, res) => {
         } else {
             return res.status(401).send({'response': 'wrong password'});
         }
-
     } catch (e) {
         console.log(e);
         return res.status(500).send();
