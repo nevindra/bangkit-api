@@ -14,7 +14,10 @@ exports.getUsers = async (req, res) => {
 exports.getUserByID = async (req, res) => {
     const id_user = req.params.id;
     try {
-        const user = await client.query('SELECT * FROM users WHERE id_user = $1', [id_user]);
+        const user = await client.query('SELECT users.id_user, users.full_name, users.phone_number, users.email, balance.saldo ' +
+            'FROM users JOIN balance ' +
+            'ON (users.id_user = $1 AND balance.id_user = $1) ' +
+            'GROUP BY users.id_user, balance.saldo;', [id_user]);
         if (typeof user.rows[0] === 'undefined') return res.status(404).send({'response': 'user not found'});
         res.status(200).send(user.rows[0]);
     } catch (e) {
@@ -27,7 +30,8 @@ exports.postRegistration = async (req, res) => {
     const saltRounds = 12;
     try {
         const checkUser = await client.query('SELECT * FROM users WHERE email = $1', [email])
-        if (checkUser.rows.length === 1) return res.status(409)
+        console.log(checkUser.rows.length )
+        if (checkUser.rows.length >= 1) return res.status(409)
             .send({'response': 'user found. cant make double account for the same person'})
 
         const salt = bcrypt.genSaltSync(saltRounds);

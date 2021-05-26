@@ -18,7 +18,8 @@ exports.registerVehicle = async (req, res) => {
 };
 
 exports.getVehicles = async (req, res) => {
-    const {id_user} = req.body
+
+    const {id_user} = req.params
 
     try {
         const results = await client.query('SELECT * FROM user_vehicle WHERE id_user = $1', [id_user]);
@@ -31,11 +32,10 @@ exports.getVehicles = async (req, res) => {
 
 exports.getVehiclesById = async (req, res) => {
 
-    const {id_user, id_vehicle} = req.body
-
+    const {id_user, id_vehicle} = req.params
     try {
         const results = await client.query('SELECT * FROM user_vehicle WHERE id_user = $1 AND id_vehicle = $2', [id_user, id_vehicle]);
-        res.send(results.rows[0]);
+        res.status(200).send(results.rows[0]);
     } catch (e) {
         console.log(e);
         res.status(500).send();
@@ -43,7 +43,7 @@ exports.getVehiclesById = async (req, res) => {
 };
 
 exports.deleteVehicleById = async (req, res) => {
-// test webhooks github
+
     const {id_user, id_vehicle} = req.body
 
     try {
