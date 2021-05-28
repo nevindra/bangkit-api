@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "start": "node main.js",
-    "test": "mocha",
-    "nodemon": "nodemon main.js"
+    "test": "nodemon main.js",
+    "developer": "nodemon main.js"
   },
   "keywords": [],
   "author": "",

@@ -19,16 +19,34 @@ exports.confirmationPayment = async (req, res) => {
     }
 };
 
-exports.historyTransaction = async (req, res) => {
+exports.historyTransactionNotDone = async (req, res) => {
 
-    const {id_user} = req.body;
+    const id_user = req.params.id
 
     try {
-        const user = await client.query('SELECT * FROM users WHERE id_user = $1', [id_user]);
+        const user = await client.query('SELECT * FROM parking_transactions WHERE id_user = $1 AND parking_transactions."isDone" = false ', [id_user]);
         if (typeof user.rows[0] === 'undefined') {
             return res.status(404).send();
         } else {
-            res.status(200);
+            res.status(200).send(user.rows);
+        }
+
+    } catch (e) {
+        console.log(e);
+        res.status(500).send();
+    }
+};
+
+exports.historyTransactionIsDone = async (req, res) => {
+
+    const id_user = req.params.id
+
+    try {
+        const user = await client.query('SELECT * FROM parking_transactions WHERE id_user = $1 AND parking_transactions."isDone" = true ', [id_user]);
+        if (typeof user.rows[0] === 'undefined') {
+            return res.status(404).send();
+        } else {
+            res.status(200).send(user.rows);
         }
 
     } catch (e) {
@@ -51,3 +69,4 @@ exports.topUp = async (req, res) => {
         res.status(500).send();
     }
 };
+
