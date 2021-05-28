@@ -23,9 +23,10 @@ PORT = <YOUR PORT>
 2. Login
 3. Verification Vehicles
 4. Get User Vehicles
-5. History Transactions
-6. Top up.
-7. Pin Confirmation
+5. Delete User Vehicle   
+6. History Transactions
+7. Top up.
+8. Pin Confirmation
 
 
 ### Optional :

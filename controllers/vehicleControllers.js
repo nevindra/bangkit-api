@@ -44,6 +44,7 @@ exports.getVehiclesById = async (req, res) => {
     const {id_user, id_vehicle} = req.params
     try {
         const results = await client.query('SELECT * FROM user_vehicle WHERE id_user = $1 AND id_vehicle = $2', [id_user, id_vehicle]);
+        if (typeof results.rows[0] === 'undefined')
         res.status(200).send(results.rows[0]);
     } catch (e) {
         console.log(e);
@@ -56,12 +57,12 @@ exports.deleteVehicleById = async (req, res) => {
     const {id_user, id_vehicle} = req.body
 
     try {
-        const results = await client.query('SELECT * FROM user_vehicle WHERE id_user = $1 AND id_vehicle = $2', [id_user, id_vehicle]);
-        if (results.rows.length === 1) {
-            res.send(404);
+        const result = await client.query('SELECT * FROM user_vehicle WHERE id_user = $1 AND id_vehicle = $2', [id_user, id_vehicle]);
+        if (typeof result.rows[0] === 'undefined') {
+            res.status(404).send();
         } else {
             await client.query('DELETE FROM user_vehicle WHERE id_user = $1 AND id_vehicle = $2', [id_user, id_vehicle]);
-            res.status(200);
+            res.status(200).send();
         }
     } catch (e) {
         console.log(e);
