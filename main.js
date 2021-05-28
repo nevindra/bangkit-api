@@ -2,13 +2,26 @@ const express = require('express');
 const app = express();
 const multer = require('multer');
 const db = require('./config/database')
+const fs = require('fs');
+const path = require('path')
 
 const PORT = process.env.PORT;
+
+
+if (!fs.existsSync('./images')) {
+    fs.mkdir(
+        path.join(__dirname, 'images'), (err) => {
+            if (err) {
+                return console.error(err);
+            }
+            console.log('Directory created successfully!');
+        })
+}
 
 const fileStorage = multer.diskStorage(
     {
         destination: function (req, file, cb) {
-            cb(null, './images/')
+            cb(null, './images')
         },
         filename: function (req, file, cb) {
             cb(null, req.body.plate_number + "_" + req.body.id_user + "_" + req.body.car_type + "." + file.originalname.split(".")[1])
@@ -47,7 +60,9 @@ app.use('/api/', vehicleRoutes);
 app.use('/api/', transactionRoutes);
 
 db.connect();
-app.listen(process.env.PORT, err => {
+const server = app.listen(process.env.PORT, err => {
     if (err) console.log(err);
     console.log(`Connected to port ${PORT} `)
 });
+
+module.exports = server

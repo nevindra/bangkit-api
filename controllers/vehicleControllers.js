@@ -8,9 +8,18 @@ exports.registerVehicle = async (req, res) => {
     try {
         await client.query(
             'INSERT INTO user_vehicle(id_user,plate_number,car_type,img_stnk) VALUES($1,$2,$3,$4)',
-            [id_user, plate_number, car_type,imageUrl]
+            [id_user, plate_number, car_type, imageUrl]
         )
-        res.status(201).send({'response': 'succeeded'})
+
+        const results = await client.query('SELECT * FROM user_vehicle WHERE id_user = $1 and plate_number = $2', [id_user, plate_number]);
+        const userVehicle = results.rows[0]
+
+        res.status(201).send({
+            'response': 'succeeded',
+            'data': {
+                userVehicle
+            }
+        })
     } catch (e) {
         console.log(e)
         res.status(400).send(e);

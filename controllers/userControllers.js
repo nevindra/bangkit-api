@@ -47,7 +47,7 @@ exports.postRegistration = async (req, res) => {
             'INSERT INTO balance(id_user,saldo) VALUES($1,0)',
             [registeredUser.rows[0].id_user]
         );
-        return res.status(201).send(registeredUser.rows[0]);
+        return res.status(201).send();
     } catch
         (e) {
         console.log(e);
