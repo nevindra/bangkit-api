@@ -56,7 +56,7 @@ exports.postRegistration = async (req, res) => {
 };
 
 exports.loginUser = async (req, res) => {
-    const {email, password} = req.body;
+    const {email, password, device_token} = req.body;
 
     try {
         const user = await client.query('SELECT * FROM users WHERE email = $1', [email]);
@@ -68,6 +68,14 @@ exports.loginUser = async (req, res) => {
                 'FROM users JOIN balance ' +
                 'ON (users.id_user = $1 AND balance.id_user = $1) ' +
                 'GROUP BY users.id_user, balance.saldo;', [id_user])
+            const userDevice = await client.query('SELECT * FROM user_device WHERE id_user = $1', [id_user])
+            if (typeof userDevice.rows[0] === 'undefined') {
+                console.log('user dibuat')
+                await client.query('INSERT INTO user_device(id_user, device_token) VALUES ($1,$2)', [id_user, device_token])
+            } else {
+                console.log('user diupdate')
+                await client.query('UPDATE user_device SET device_token = $2 WHERE id_user = $1', [id_user, device_token])
+            }
             return res.status(200).send(userData.rows);
         } else {
             return res.status(401).send({'response': 'wrong password'});
