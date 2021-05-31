@@ -2,16 +2,58 @@ const client = require('../config/database');
 const bcrypt = require('bcrypt');
 
 exports.confirmationPayment = async (req, res) => {
-    const {id_user, verification_pin} = req.body;
+    const {id_user, verification_pin, payment_status} = req.body;
     try {
         const user = await client.query('SELECT * FROM users WHERE id_user = $1', [id_user]);
         if (typeof user.rows[0] === 'undefined') return res.status(404).send({'response': 'user not found'});
         let verification_pin_user = user.rows[0].verification_pin
         const isAuth = await bcrypt.compareSync(verification_pin, verification_pin_user);
-        if (isAuth) {
-            res.status(200).send({'response': 'succeeded'});
+        if (isAuth && payment_status === 1) {
+            const userBalance = await client.query(
+                'SELECT * FROM balance WHERE id_user = $1', [id_user]
+            )
+
+            const userTransaction = await client.query(
+                'SELECT id_user, SUM(price) as total FROM parking_transactions WHERE id_user = $1 GROUP BY  id_user', [id_user]
+            );
+
+            const saldo = userBalance.rows[0].saldo - userTransaction.rows[0].total;
+
+            await client.query(
+                'UPDATE parking_transactions SET "isDone" = true WHERE id_user = $1 AND id_transaction\n' +
+                'IN ( SELECT id_transaction FROM parking_transactions WHERE id_user = $1 ORDER BY id_transaction desc)', [id_user]
+            );
+
+            await client.query(
+                'UPDATE balance SET saldo = $1 WHERE id_user = $2', [saldo, id_user]
+            );
+
+            return res.status(200).send({'response': 'Payment succeeded'});
+        } else if (isAuth && payment_status === 2) {
+            const {amount} = req.body;
+
+            const userBalance = await client.query(
+                'SELECT * FROM balance WHERE id_user = $1', [id_user]
+            )
+
+            const saldo = userBalance.rows[0].saldo + amount
+            console.log(saldo)
+            await client.query(
+                'UPDATE user_recharge SET "isDone" = true WHERE id_user = $1 AND id_recharge\n' +
+                'IN ( SELECT id_recharge FROM user_recharge WHERE id_user = $1 ORDER BY id_recharge desc)', [id_user]
+            );
+
+            await client.query(
+                'UPDATE balance SET saldo = $2 WHERE id_user = $1', [id_user, saldo]
+            )
+
+
+            return res.status(200).send({'response': 'Topup succeeded'});
+        } else if (isAuth && payment_status === 3) {
+            return res.status(200).send({'response': 'Pin confirmation succeeded'});
+
         } else {
-            res.status(404).send({'response': 'pin not valid'});
+            return res.status(404).send({'response': 'pin not valid'});
         }
     } catch (e) {
         console.log(e);
@@ -69,4 +111,18 @@ exports.topUp = async (req, res) => {
         res.status(500).send();
     }
 };
+
+exports.getSaldo = async (req, res) => {
+    const {id_user} = req.body;
+
+    try {
+        const user = await client.query(
+            'SELECT * FROM balance WHERE id_user = $1', [id_user]
+        )
+        res.status(200).send(user.rows[0])
+    } catch (e) {
+        console.log(e);
+        res.status(500).send();
+    }
+}
 
