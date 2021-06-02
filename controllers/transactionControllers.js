@@ -22,13 +22,13 @@ exports.confirmationPayment = async (req, res) => {
             const saldo = userBalance.rows[0].saldo - userTransaction.rows[0].total;
 
             await client.query(
-             'UPDATE parking_transactions SET "isDone" = true WHERE id_user = 15 AND id_transaction\n' +
+             'UPDATE parking_transactions SET "isDone" = true WHERE id_user = $1 AND id_transaction\n' +
                 '                IN (\n' +
                 '                    SELECT id_transaction\n' +
                 '                    FROM parking_transactions\n' +
-                '                    WHERE id_user = 15 AND "isDone" = false\n' +
+                '                    WHERE id_user = $1 AND "isDone" = false\n' +
                 '                    ORDER BY id_transaction desc\n' +
-                '                    LIMIT 1)'
+                '                    LIMIT 1)', [id_user]
                 );
 
             await client.query(
@@ -47,13 +47,13 @@ exports.confirmationPayment = async (req, res) => {
             const saldo = userBalance.rows[0].saldo + amount
 
             await client.query(
-                'UPDATE user_recharge SET "isDone" = true WHERE id_user = 16 AND id_recharge\n' +
+                'UPDATE user_recharge SET "isDone" = true WHERE id_user = $1 AND id_recharge\n' +
                 'IN (\n' +
                 '    SELECT id_recharge\n' +
                 '    FROM user_recharge\n' +
-                '    WHERE id_user = 16 AND "isDone" = false\n' +
+                '    WHERE id_user = $1 AND "isDone" = false\n' +
                 '    ORDER BY id_recharge desc\n' +
-                '    LIMIT 1);'
+                '    LIMIT 1);', [id_user]
             );
 
             await client.query(
